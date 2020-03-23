@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace LeetCodePractice
@@ -58,15 +59,83 @@ namespace LeetCodePractice
         }
 
         // 10. Regular Expression Matching https://leetcode.com/problems/regular-expression-matching/
+        /// <summary>
+        /// Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*'.
+        /// '.' Matches any single character.
+        /// '*' Matches zero or more of the preceding element.
+        /// The matching should cover the entire input string (not partial).
+        /// Note:
+        /// s could be empty and contains only lowercase letters a-z.
+        /// p could be empty and contains only lowercase letters a-z, and characters like.or*.
+        /// </summary>
         [Theory]
         [InlineData("aa", "a", false)]
-        //[InlineData("aa", "a*", true)]
-        //[InlineData("ab", ".*", true)]
-        //[InlineData("aab", "c*a*b", true)]
-        //[InlineData("mississippi", "mis*is*p*.", false)]
+        [InlineData("aa", "a*", true)]
+        [InlineData("ab", ".*", true)]
+        [InlineData("aab", "c*a*b", true)]
+        [InlineData("mississippi", "mis*is*p*.", false)]
+        [InlineData("ab", ".*c", false)] // First failed Test case
+        [InlineData("aaa", "a*a", true)] // First failed Test case
+        [InlineData("abc", "a*b*c*abc", true)]
+        [InlineData("ab", ".*..", true)]
+        [InlineData("ab", ".*ab", true)]
+        [InlineData("bbbba", ".*a*a", true)]
+        [InlineData("bbbba", ".*b", false)]
         public void RegularExpressionMatching(string s, string p, bool expected)
         {
+            // There are 3 ways to fail: Unmatched letter in p, Unmatched (remaining) in s, 
             bool ans = false;
+
+            int i = 0;
+            int j = 0;
+
+            Queue<Tuple<char, char>> starMatched = new Queue<Tuple<char, char>>(s.Length);
+
+            while (j < p.Length)
+            {                
+                char current = p[j];                 
+                char? next = j + 1 < p.Length ? p[j + 1] : (char?)null;
+                bool isAny = current == '.';
+                bool isZeroOrMore = next == '*';
+                
+                if (current == '*')
+                {
+                    throw new Exception();
+                }
+                
+                if (isZeroOrMore)
+                {
+                    while(i < s.Length && (isAny || s[i] == current))
+                    {
+                        starMatched.Enqueue(Tuple.Create(s[i], p[j]));
+
+                        i++;                        
+                    }
+                    j = j + 2;
+                } else
+                {
+                    Queue<Tuple<char, char>> temp = new Queue<Tuple<char, char>>(s.Length);
+                    while (starMatched.Any() && current != '.' && starMatched.Peek().Item1 != current)
+                    {
+                        temp.Enqueue(starMatched.Dequeue());                       ;
+                    }
+                    if (i < s.Length && (isAny || s[i] == current))
+                    {
+                        i++;
+                        j++;
+                    } else if (starMatched.Any() && (starMatched.Peek().Item1 == current || starMatched.Peek().Item2 == current))
+                    {
+                        temp.Enqueue(starMatched.Dequeue());
+                        j++;
+                    }
+                    else // No Match
+                    {
+                        break;
+                    }
+                }
+            }
+
+            ans = !starMatched.Any() && i == s.Length && j == p.Length;
 
             Assert.Equal(expected, ans);
         }
@@ -158,7 +227,7 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-        // 41. First Missing Positive https://leetcode.com/problems/first-missing-positive/
+        // 41. First Missing Positive [HARD] https://leetcode.com/problems/first-missing-positive/
         // Given an unsorted integer array, find the smallest missing positive integer.
         // Note: Your algorithm should run in O(n) time and uses constant extra space.
         [Theory]
@@ -200,7 +269,7 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-        // 76. Minimum Window Substring https://leetcode.com/problems/minimum-window-substring/
+        // 76. Minimum Window Substring [hard] https://leetcode.com/problems/minimum-window-substring/
         // Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
         // Note:
         // If there is no such window in S that covers all characters in T, return the empty string "".
@@ -403,7 +472,7 @@ namespace LeetCodePractice
             }
         }
 
-        // 20. Valid Parentheses https://leetcode.com/problems/valid-parentheses/
+        // 20. Valid Parentheses [EASY] https://leetcode.com/problems/valid-parentheses/
         /// <summary>
         /// Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
         /// An input string is valid if:
@@ -413,13 +482,50 @@ namespace LeetCodePractice
         /// </summary>
         [Theory]
         [InlineData("()", true)]
-        //[InlineData("()[]{}", true)]
-        //[InlineData("(]", false)]
-        //[InlineData("([)]", false)]
-        //[InlineData("{[]}", true)]
+        [InlineData("()[]{}", true)]
+        [InlineData("(]", false)]
+        [InlineData("([)]", false)]
+        [InlineData("{[]}", true)]
         public void ValidParentheses(string s, bool expected)
         {
-            bool ans = false;
+            // 3/22/2020
+            // Runtime: 72 ms, faster than 82.85% of C# online submissions for Valid Parentheses.
+            // Memory Usage: 22 MB, less than 6.38 % of C# online submissions for Valid Parentheses.
+            bool ans = false;                       
+
+            string lefts = "{[(";
+            string rights = "}])";
+
+            Stack<char> unmatched = new Stack<char>();
+
+            int i = 0;
+
+            while (i< s.Length)
+            {
+                if (lefts.Contains(s[i]))
+                {
+                    unmatched.Push(s[i]);
+                    i++;
+                } else
+                {
+                    if (unmatched.Any())
+                    {
+                        char last = unmatched.Pop();
+                        if (s[i] == rights[lefts.IndexOf(last)])
+                        {
+                            i++;
+                        } else
+                        {
+                            break;
+                        }                        
+                    } else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            ans = i == s.Length && !unmatched.Any();
 
             Assert.Equal(expected, ans);
         }
@@ -541,13 +647,37 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-        // 198. House Robber https://leetcode.com/problems/house-robber/
+        // 198. House Robber [EASY] https://leetcode.com/problems/house-robber/
+        /// <summary>
+        /// You are a professional robber planning to rob houses along a street. 
+        /// Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected 
+        /// and it will automatically contact the police if two adjacent houses were broken into on the same night.
+        /// Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+        /// </summary>
         [Theory]
         [InlineData(new int[] { 1, 2, 3, 1 }, 4)] // Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3). Total amount you can rob = 1 + 3 = 4.
-        //[InlineData(new int[] { 2, 7, 9, 3, 1 }, 12)] // Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1). Total amount you can rob = 2 + 9 + 1 = 12.
+        [InlineData(new int[] { 2, 7, 9, 3, 1 }, 12)] // Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1). Total amount you can rob = 2 + 9 + 1 = 12.
+        [InlineData(new int[] { 2, 1, 1, 2 }, 4)]
+        [InlineData(new int[] { }, 0)]
         public void HouseRobber(int[] nums, int expected)
         {
+            // 3/22/2020
+            // Runtime: 92 ms, faster than 49.93% of C# online submissions for House Robber.
+            // Memory Usage: 24 MB, less than 9.09 % of C# online submissions for House Robber.
             int ans = 0;
+
+            int[] maxAtIndex = new int[nums.Length];
+
+            for (int i = 0; i < maxAtIndex.Length; i++)
+            {
+                int current = nums[i];
+                int back2 = i - 2 >= 0 ? maxAtIndex[i - 2] : 0;
+                int back3 = i - 3 >= 0 ? maxAtIndex[i - 3] : 0;
+                int opt1 = current + back2;
+                int opt2 = current + back3;
+                maxAtIndex[i] = Math.Max(opt1, opt2);
+                ans = Math.Max(ans, maxAtIndex[i]);
+            }
 
             Assert.Equal(expected, ans);
         }
@@ -574,7 +704,7 @@ namespace LeetCodePractice
             };
         }
 
-        // 300. Longest Increasing Subsequence https://leetcode.com/problems/longest-increasing-subsequence/
+        // 300. Longest Increasing Subsequence [Medium] https://leetcode.com/problems/longest-increasing-subsequence/
         // Given an unsorted array of integers, find the length of longest increasing subsequence.
         // Note:
         //      There may be more than one LIS combination, it is only necessary for you to return the length.
@@ -585,6 +715,13 @@ namespace LeetCodePractice
         public void LongestIncreasingSubsequence(int[] heights, int expected)
         {
             int ans = 0;
+
+            Stack<List<int>> stack = new Stack<List<int>>();
+
+            for(int i = 0; i < heights.Length; i++)
+            {
+
+            }
 
             Assert.Equal(expected, ans);
         }
