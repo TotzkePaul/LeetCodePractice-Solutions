@@ -152,7 +152,7 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-        // 4. Median of Two Sorted Arrays https://leetcode.com/problems/median-of-two-sorted-arrays/
+        // 4. Median of Two Sorted Arrays [HARD] https://leetcode.com/problems/median-of-two-sorted-arrays/
         /// <summary>
         /// There are two sorted arrays nums1 and nums2 of size m and n respectively.
         /// Find the median of the two sorted arrays.The overall run time complexity should be O(log (m+n)).
@@ -1155,13 +1155,30 @@ namespace LeetCodePractice
         // Each time you can either climb 1 or 2 steps.In how many distinct ways can you climb to the top?
         // Note: Given n will be a positive integer.
         [Theory]
+        [InlineData(1, 1)]
         [InlineData(2, 2)] // Explanation: There are two ways to climb to the top. 1. 1 step + 1 step 2. 2 steps
-        //[InlineData(3, 3)] // Explanation: There are three ways to climb to the top. 1. 1 step + 1 step + 1 step 2. 1 step + 2 steps 3. 2 steps + 1 step
+        [InlineData(3, 3)] // Explanation: There are three ways to climb to the top. 1. 1 step + 1 step + 1 step 2. 1 step + 2 steps 3. 2 steps + 1 step
+        [InlineData(4, 5)]
         public void ClimbingStairs(int n, int expected)
         {
-            int ans = 0;
+            // 3/24/2020
+            // Runtime: 40 ms, faster than 68.25% of C# online submissions for Climbing Stairs.
+            // Memory Usage: 14.6 MB, less than 5.88 % of C# online submissions for Climbing Stairs.
+            int[] cache = new int[n+1];
+            cache[0] = 1;
+            cache[1] = 1;
+            int ans = ClimbStairs(n, cache);
 
             Assert.Equal(expected, ans);
+        }
+
+        public int ClimbStairs(int n, int[] cache)
+        {
+            if(cache[n] == 0){
+                cache[n] = ClimbStairs(n - 1, cache) + ClimbStairs(n - 2, cache);
+            }
+
+            return cache[n];
         }
 
 
@@ -1173,6 +1190,40 @@ namespace LeetCodePractice
         public void MaximumSubarray(int[] nums, int expected)
         {
             int ans = 0;
+
+            int start = 0;
+            int end = 1;
+
+            int sum = nums[0];
+
+            while(end < nums.Length)
+            {
+                break; // GOES INTO INF LOOP
+                int tail = nums[end];
+                int newsumtail = sum + tail;
+                if(newsumtail > sum)
+                {
+                    sum = newsumtail;
+                    end++;
+                } else
+                {
+                    while (start < end)
+                    {
+                        int head = nums[start];
+                        int newsumhead = sum - head;
+                        if (newsumhead > sum)
+                        {
+                            sum = newsumhead;
+                            start++;
+                        } else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ans = sum;
 
             Assert.Equal(expected, ans);
         }
@@ -1203,7 +1254,22 @@ namespace LeetCodePractice
         [InlineData(new[] { 2, 7, 11, 15 }, 9, new[] { 0, 1 })] // Explanation: Because nums[0] + nums[1] = 2 + 7 = 9,
         public void TwoSum(int[] nums, int target, int[] expected)
         {
+            // 3/22/2020
+            // Runtime: 244 ms, faster than 80.67% of C# online submissions for Two Sum.
+            // Memory Usage: 31.3 MB, less than 5.08% of C# online submissions for Two Sum.
             int[] ans = null;
+            Dictionary<int, int> compliment = new Dictionary<int, int>();
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (compliment.ContainsKey(nums[i]))
+                {
+                    ans = new int[] { compliment[nums[i]], i };
+                } else
+                {
+                    compliment[target - nums[i]] = i;
+                }
+            }
 
             Assert.Equal(expected, ans);
         }
