@@ -16,7 +16,7 @@ namespace LeetCodePractice
         }
 
 
-        // 98. Validate Binary Search Tree https://leetcode.com/problems/validate-binary-search-tree/
+        // 98. Validate Binary Search Tree [MEDIUM] https://leetcode.com/problems/validate-binary-search-tree/
         /// <summary>
         /// Given a binary tree, determine if it is a valid binary search tree (BST).
         ///         Assume a BST is defined as follows:
@@ -51,7 +51,7 @@ namespace LeetCodePractice
         }
 
 
-        // 124. Binary Tree Maximum Path Sum https://leetcode.com/problems/binary-tree-maximum-path-sum/
+        // 124. Binary Tree Maximum Path Sum [HARD] https://leetcode.com/problems/binary-tree-maximum-path-sum/
         /// <summary>
         /// Given a *non-empty* binary tree, find the maximum path sum.
         /// For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. 
@@ -102,7 +102,7 @@ namespace LeetCodePractice
         }
 
 
-        // 617. Merge Two Binary Trees https://leetcode.com/problems/merge-two-binary-trees/
+        // 617. Merge Two Binary Trees [EASY] https://leetcode.com/problems/merge-two-binary-trees/
         /// <summary>
         /// Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not.
         /// You need to merge them into a new binary tree.
@@ -143,7 +143,7 @@ namespace LeetCodePractice
             };
         }
 
-        // 104. Maximum Depth of Binary Tree https://leetcode.com/problems/maximum-depth-of-binary-tree/
+        // 104. Maximum Depth of Binary Tree [EASY] https://leetcode.com/problems/maximum-depth-of-binary-tree/
         /// <summary>
         /// Given a binary tree, find its maximum depth.
         /// The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
@@ -176,8 +176,8 @@ namespace LeetCodePractice
 
 
 
-        // 226. Invert Binary Tree https://leetcode.com/problems/invert-binary-tree/
-        // Invert a binary tree.
+        // 226. Invert Binary Tree [EASY] https://leetcode.com/problems/invert-binary-tree/
+        // Invert a binary tree. (Left nodes are swapped with Right nodes)
         [Theory]
         [MemberData(nameof(GetInvertBinaryTreeData))]
         public void InvertBinaryTree(TreeNode root, TreeNode expected)

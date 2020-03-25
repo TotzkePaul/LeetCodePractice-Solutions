@@ -13,7 +13,7 @@ namespace LeetCodePractice
     }
     public class LinkedLists
     {
-        // Helper to validate 2 ListNodes are equal
+        // Assert Helper to validate 2 ListNodes are equal
         private static void CompareListNode(ListNode expected, ListNode actual)
         {
             Assert.Equal(expected == null, actual == null);
