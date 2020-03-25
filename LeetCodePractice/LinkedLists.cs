@@ -41,6 +41,23 @@ namespace LeetCodePractice
         {
             ListNode result = new ListNode(0);
 
+            ListNode current1 = l1;
+            ListNode current2 = l2;
+
+            int carried = Math.Max(current1.val + current2.val - 10, 0);
+            int val = current1.val + current2.val + carried;
+
+            int digit = val % 10;
+
+            while (current1 != null || current2 != null)
+            {
+                val = current1.val + current2.val + carried;
+                digit = val % 10; 
+                carried = Math.Max(val - 10, 0);
+                current1 = current1.next;
+                current2 = current2.next;
+            }
+
             CompareListNode(expected, result);
         }
 

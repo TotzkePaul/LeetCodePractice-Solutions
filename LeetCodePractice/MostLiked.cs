@@ -868,9 +868,9 @@ namespace LeetCodePractice
             };
         }
 
-        // 338. Counting Bits https://leetcode.com/problems/counting-bits/
+        // 338. Counting Bits [MEDIUM] https://leetcode.com/problems/counting-bits/
         /// <summary>
-        /// Given a non negative integer number num. For every numbers i in the range 0 ? i ? num calculate the number of 1's in their binary representation and return them as an array.
+        /// Given a non negative integer number num. For every numbers i in the range 0 <= i <= num calculate the number of 1's in their binary representation and return them as an array.
         /// Follow up:
         ///     It is very easy to come up with a solution with run time O(n*sizeof(integer)). But can you do it in linear time O(n) /possibly in a single pass?
         ///     Space complexity should be O(n).
@@ -878,10 +878,26 @@ namespace LeetCodePractice
         /// </summary>
         [Theory]
         [InlineData(2, new[] { 0, 1, 1 })]
-        //[InlineData(5, new [] { 0, 1, 1, 2, 1, 2 })]
+        [InlineData(5, new [] { 0, 1, 1, 2, 1, 2 })]
         public void CountingBits(int num, int[] expected)
         {
-            int[] ans = null;
+            // 3/24/2020
+            // Comment: BEST IN CLASS FOR MEM USAGE! First Attempt too!
+            // Runtime: 220 ms, faster than 80.78% of C# online submissions for Counting Bits.
+            // Memory Usage: 28.9 MB, less than 100.00 % of C# online submissions for Counting Bits.
+
+            int[] ans = new int[num+1];
+
+            for(int i = 0; i <= num; i++)
+            {
+                for(int j = 1; j > 0; j = j << 1) // j is a number that has exactly one 1 and is bitshifted left every iteration. 
+                {
+                    if((i & j) > 0)
+                    {
+                        ans[i]++;
+                    }
+                }                
+            }
 
             Assert.Equal(expected, ans);
         }
@@ -892,10 +908,21 @@ namespace LeetCodePractice
         //      Your algorithm should have a linear runtime complexity.Could you implement it without using extra memory?
         [Theory]
         [InlineData(new[] { 2, 2, 1 }, 1)]
-        //[InlineData(new[] { 4, 1, 2, 1, 2 }, 4)]
+        [InlineData(new[] { 4, 1, 2, 1, 2 }, 4)]
         public void SingleNumber(int[] nums, int expected)
         {
+            // 3/24/2020
+            // Comment: I legit knew this from memory from Data Structures class from 2011. Thanks Dr Krohn! 
+            // The idea being that x ^ x = 0 and that xor is transitive
+            // Runtime: 88 ms, faster than 99.66% of C# online submissions for Single Number.
+            // Memory Usage: 26.2 MB, less than 14.29 % of C# online submissions for Single Number.
+
             int ans = 0;
+
+            for(int i = 0; i < nums.Length; i++)
+            {
+                ans = ans ^ nums[i]; 
+            }
 
             Assert.Equal(expected, ans);
         }
@@ -963,16 +990,41 @@ namespace LeetCodePractice
         }
 
 
-        // 169. Majority Element https://leetcode.com/problems/majority-element/
+        // 169. Majority Element [EASY] https://leetcode.com/problems/majority-element/
         // Given an array of size n, find the majority element. The majority element is the element that appears more than ? n/2 ? times.
         // You may assume that the array is non-empty and the majority element always exist in the array.
         [Theory]
+        [InlineData(new[] { 1 }, 1)]
         [InlineData(new[] { 3, 2, 3 }, 3)]
-        //[InlineData(new[] { 2, 2, 1, 1, 1, 2, 2 }, 2)]
+        [InlineData(new[] { 2, 2, 1, 1, 1, 2, 2 }, 2)]
         public void MajorityElement(int[] nums, int expected)
         {
-            int ans = 0;
 
+            // 3/24/2020
+            // Runtime: 116 ms, faster than 76.31% of C# online submissions for Majority Element.
+            // Memory Usage: 30 MB, less than 50.00 % of C# online submissions for Majority Element.
+            int? ans = null;
+            Dictionary<int, int> counts = new Dictionary<int, int>();
+            for(int i = 0; i < nums.Length; i++)
+            {
+                if (counts.ContainsKey(nums[i]))
+                {
+                    counts[nums[i]]++;
+                    if (counts[nums[i]] > nums.Length/2)
+                    {
+                        ans = nums[i];
+                        break;
+                    }
+                } else
+                {
+                    if(ans == null)
+                    {
+                        ans = nums[i];
+                    }
+                    counts[nums[i]] = 1;
+                }
+            }
+             
             Assert.Equal(expected, ans);
         }
 
@@ -1030,21 +1082,35 @@ namespace LeetCodePractice
         }
 
 
-        // 121. Best Time to Buy and Sell Stock https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+        // 121. Best Time to Buy and Sell Stock [EASY] https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
         /// <summary>
         /// Say you have an array for which the i^th element is the price of a given stock on day i.
         /// If you were only permitted to complete at most one transaction(i.e., buy one and sell one share of the stock), design an algorithm to find the maximum profit.
         /// Note that you cannot sell a stock before you buy one.
         /// </summary>
-        /// <param name="nums"></param>
-        /// <param name="expected"></param>
         [Theory]
         [InlineData(new[] { 7, 1, 5, 3, 6, 4 }, 5)] // Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5. Not 7-1 = 6, as selling price needs to be larger than buying price.
-        //[InlineData(new[] { 7, 6, 4, 3, 1 }, 0)] // Explanation: In this case, no transaction is done, i.e. max profit = 0.
-        public void BestTimeToBuyAndSellStock(int[] nums, int expected)
+        [InlineData(new[] { 7, 6, 4, 3, 1 }, 0)] // Explanation: In this case, no transaction is done, i.e. max profit = 0.
+        public void BestTimeToBuyAndSellStock(int[] prices, int expected)
         {
-            int ans = 0;
+            // 3/24/2020
+            // Runtime: 96 ms, faster than 68.35% of C# online submissions for Best Time to Buy and Sell Stock.
+            // Memory Usage: 25.3 MB, less than 9.52 % of C# online submissions for Best Time to Buy and Sell Stock.
+            int profit = 0;
 
+            if (prices != null && prices.Length != 0)
+            {
+                int min = prices[0];
+
+                for (int i = 1; i < prices.Length; i++)
+                {
+                    min = Math.Min(min, prices[i]);
+
+                    profit = Math.Max(profit, prices[i] - min);
+
+                }
+            }
+            int ans = profit;
             Assert.Equal(expected, ans);
         }
 
@@ -1167,18 +1233,55 @@ namespace LeetCodePractice
             int[] cache = new int[n+1];
             cache[0] = 1;
             cache[1] = 1;
-            int ans = ClimbStairs(n, cache);
+            int ans = ClimbStairsRecursive(n, cache);
 
             Assert.Equal(expected, ans);
         }
 
-        public int ClimbStairs(int n, int[] cache)
+        public int ClimbStairsRecursive(int n, int[] cache)
         {
             if(cache[n] == 0){
-                cache[n] = ClimbStairs(n - 1, cache) + ClimbStairs(n - 2, cache);
+                cache[n] = ClimbStairsRecursive(n - 1, cache) + ClimbStairsRecursive(n - 2, cache);
             }
 
             return cache[n];
+        }
+
+
+        // 70. Climbing Stairs (Iterative) https://leetcode.com/problems/climbing-stairs/
+        // Comment: lol this is just Fibonacci. Ahh I even noticed that it was unnessary to account for zero. 
+        // You are climbing a stair case. It takes n steps to reach to the top.
+        // Each time you can either climb 1 or 2 steps.In how many distinct ways can you climb to the top?
+        // Note: Given n will be a positive integer.
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(2, 2)] // Explanation: There are two ways to climb to the top. 1. 1 step + 1 step 2. 2 steps
+        [InlineData(3, 3)] // Explanation: There are three ways to climb to the top. 1. 1 step + 1 step + 1 step 2. 1 step + 2 steps 3. 2 steps + 1 step
+        [InlineData(4, 5)]
+        [InlineData(20, 10946)]
+        public void ClimbingStairs_V2(int n, int expected)
+        {
+            // 3/24/2020
+            // I thought the performance would be better by a lot... but the same??? 
+            // I guess this would be the most trivial case for Tail Recursion Elimination(aka Unrolling a (recursive) function) in compilers. Like how do people use less memmory than this? 
+            // Runtime: 40 ms, faster than 68.25% of C# online submissions for Climbing Stairs.
+            // Memory Usage: 14.5 MB, less than 5.88 % of C# online submissions for Climbing Stairs.
+
+            int prev2 = 1;
+            int prev1 = 1;
+            int current = 1;
+            // If I set current=2 and int i =3; I get the following performance: Runtime: 36 ms, faster than 92.58% of C# online submissions for Climbing Stairs. 
+
+            for (int i = 2; i <= n; i++)
+            {
+                current = prev2 + prev1;
+                prev2 = prev1;
+                prev1 = current;
+            }
+
+            int ans = current;
+
+            Assert.Equal(expected, ans);
         }
 
 
