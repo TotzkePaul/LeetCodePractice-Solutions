@@ -30,33 +30,55 @@ namespace LeetCodePractice
                 l1 = l1.next;
                 l2 = l2.next;
             }
-            Assert.Equal(expected.val, actual.val);
-            Assert.Equal(expected.next, actual.next);
+            Assert.Equal(l1.val, l2.val);
+            Assert.True(l1.next == null && l2.next == null);
         }
 
-        // 2. Add Two Numbers https://leetcode.com/problems/add-two-numbers/
+        // 2. Add Two Numbers [MEDIUM] https://leetcode.com/problems/add-two-numbers/
+        /// <summary>
+        /// You are given two *non-empty* linked lists representing two non-negative integers. 
+        /// The digits are stored in *reverse order* and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+        /// You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+        /// </summary>
         [Theory]
         [MemberData(nameof(GetValidateBinarySearchTreeData))]
         public void AddTwoNumbers(ListNode l1, ListNode l2, ListNode expected)
         {
-            ListNode result = new ListNode(0);
+            // 3/25/2020
+            // Comment: The only difficulty I had a difficult time figuring out what carried should be. Some reason carried = (val-10); seemed about like it only needed a little tweeking
+            // https://www.youtube.com/watch?v=aM4Iv7eEr2o
+            // I waited to watch until I figure this out on my own but the similarities surprised me that its easier to describe the diffferences:
+            // I preserve the values of l1 and l2 (purely for debugging). He uses null checking while I use null propagation and coalescing. 
+            // Runtime: 104 ms, faster than 85.25% of C# online submissions for Add Two Numbers.
+            // Memory Usage: 27.6 MB, less than 9.09 % of C# online submissions for Add Two Numbers.
+
+            ListNode result = new ListNode(0); // while loop assumes non-null. Dummy gets "Popped off" at the end of the function 
 
             ListNode current1 = l1;
             ListNode current2 = l2;
 
-            int carried = Math.Max(current1.val + current2.val - 10, 0);
-            int val = current1.val + current2.val + carried;
+            int carried = 0;
 
-            int digit = val % 10;
+            ListNode next = result;
 
             while (current1 != null || current2 != null)
             {
-                val = current1.val + current2.val + carried;
-                digit = val % 10; 
-                carried = Math.Max(val - 10, 0);
-                current1 = current1.next;
-                current2 = current2.next;
+                int val = (current1?.val?? 0) + (current2?.val ?? 0) + carried;
+                int digit = val % 10; 
+                carried = val / 10 % 10;
+                ListNode newest = new ListNode(digit);
+                next.next = newest;
+                next = next.next;
+                current1 = current1?.next;
+                current2 = current2?.next;
             }
+
+            if (carried > 0)
+            {
+                next.next = new ListNode(carried);
+            }
+
+            result = result.next;
 
             CompareListNode(expected, result);
         }
@@ -65,8 +87,11 @@ namespace LeetCodePractice
         {
             return new[]
             {
+                new object[] { new ListNode(9), new ListNode(1), new ListNode(0){ next= new ListNode(1) } },
+                new object[] { new ListNode(5), new ListNode(5), new ListNode(0){ next= new ListNode(1) } },
+                new object[] { new ListNode(9), new ListNode(9), new ListNode(8){ next= new ListNode(1) } },                
                 new object[] { new ListNode(2) { next = new ListNode(4) { next = new ListNode(3) } }, new ListNode(5) { next = new ListNode(6) { next = new ListNode(4) } }, new ListNode(7) { next = new ListNode(0) { next = new ListNode(8) } } },
-                new object[] { new ListNode(2) { next = new ListNode(4) { next = new ListNode(3) } }, new ListNode(2) { next = new ListNode(4) { next = new ListNode(3) } }, new ListNode(2) { next = new ListNode(4) { next = new ListNode(3) } } },
+                new object[] { new ListNode(9) { next = new ListNode(9) { next = new ListNode(9) } }, new ListNode(1), new ListNode(0) { next = new ListNode(0) { next = new ListNode(0) { next = new ListNode(1) } } } },
             };
         }
 

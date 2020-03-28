@@ -1132,7 +1132,7 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-        // 621. Task Scheduler https://leetcode.com/problems/task-scheduler/
+        // 621. Task Scheduler [MEDIUM] https://leetcode.com/problems/task-scheduler/
         /// <summary>
         /// Given a char array representing tasks CPU need to do. It contains capital letters A to Z where different letters represent different tasks. 
         /// Tasks could be done without original order. Each task could be done in one interval. For each interval, CPU could finish one task or just be idle.
@@ -1140,13 +1140,85 @@ namespace LeetCodePractice
         /// You need to return the least number of intervals the CPU will take to finish all the given tasks.
         /// </summary>
         [Theory]
-        [InlineData(new char[] { 'A', 'A', 'A', 'B', 'B', 'B' }, 2, 8)] // Explanation: A -> B -> idle -> A -> B -> idle -> A -> B.
+        [InlineData(new char[] { 'A', 'B', 'C', 'D', 'E', 'F' }, 2, 6)]
+        [InlineData(new char[] { 'A', 'A', 'A', 'A', 'A', 'A' }, 1, 11)] 
+        [InlineData(new char[] { 'A', 'A', 'A', 'B', 'B', 'B' }, 3, 10)]
+        [InlineData(new char[] { 'A', 'A', 'A', 'B', 'B', 'B' }, 0, 6)]
+        [InlineData(new char[] { 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'C', 'D', 'E', 'F', 'G' }, 2, 16)] //
+        [InlineData(new char[] { 'A', 'A', 'A', 'B', 'B', 'B' }, 2, 8)]// Explanation: A -> B -> idle -> A -> B -> idle -> A -> B.
         public void TaskScheduler(char[] tasks, int n, int expected)
         {
-            int ans = 0;
+        // Comment: I'm surprised this was slower than Version 1 (See below)
+        // Runtime: 196 ms, faster than 55.22 % of C# online submissions for Task Scheduler.
+        // Memory Usage: 34.9 MB, less than 100.00 % of C# online submissions for Task Scheduler.
+            
+            Dictionary<char, int> counts = new Dictionary<char, int>();
+
+            int max = 0;
+            int count = 0;
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                if (counts.ContainsKey(tasks[i]))
+                {
+                    counts[tasks[i]]++;
+                }
+                else
+                {
+                    counts[tasks[i]] = 1;
+                }
+
+                if(counts[tasks[i]] > max)
+                {
+                    max = counts[tasks[i]];
+                    count = 1;
+                } else if (counts[tasks[i]] == max)
+                {
+                    count++;
+                }
+            }
+
+            //Either you can perfectly pack the CPU (no idle) or there is gaps
+            int ans = Math.Max(tasks.Length, (max) * (n + 1) - n + (count - 1));
 
             Assert.Equal(expected, ans);
         }
+
+        // Version 1
+        // Comment: Builds 8, Submissions=1
+        // Runtime: 188 ms, faster than 64.93% of C# online submissions for Task Scheduler.
+        // Memory Usage: 34.8 MB, less than 100.00 % of C# online submissions for Task Scheduler.
+        //public class Solution
+        //{
+        //    public int LeastInterval(char[] tasks, int n)
+        //    {
+        //        int ans = 0;
+
+
+        //        Dictionary<char, int> counts = new Dictionary<char, int>();
+
+        //        for (int i = 0; i < tasks.Length; i++)
+        //        {
+        //            if (counts.ContainsKey(tasks[i]))
+        //            {
+        //                counts[tasks[i]]++;
+        //            }
+        //            else
+        //            {
+        //                counts[tasks[i]] = 1;
+        //            }
+        //        }
+
+        //        int keys = counts.Count();
+
+        //        int max = counts.OrderBy(x => x.Value).Last().Value;
+        //        int v = counts.Count(x => x.Value == max);
+
+        //        //Either you can perfectly pack the CPU (no idle) or there is gaps
+        //        ans = Math.Max(tasks.Length, (max) * (n + 1) - n + (v - 1));
+        //        return ans;
+        //    }
+        //}
 
 
         // 42. Trapping Rain Water https://leetcode.com/problems/trapping-rain-water/
