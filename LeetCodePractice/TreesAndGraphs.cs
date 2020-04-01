@@ -15,6 +15,17 @@ namespace LeetCodePractice
             public TreeNode(int x) { val = x; }
         }
 
+        private static void CompareTreeNode(TreeNode expected, TreeNode actual)
+        {
+            Assert.Equal(expected == null, actual == null);
+            if (expected == null || actual == null)
+                return;
+
+            Assert.Equal(expected.val, actual.val);
+            CompareTreeNode(expected.left, actual.left);
+            CompareTreeNode(expected.right, actual.right);
+        }
+
 
         // 98. Validate Binary Search Tree [MEDIUM] https://leetcode.com/problems/validate-binary-search-tree/
         /// <summary>
@@ -113,9 +124,51 @@ namespace LeetCodePractice
         [MemberData(nameof(GetMergTwoBinaryTreesData))]
         public void MergTwoBinaryTrees(TreeNode t1, TreeNode t2, TreeNode expected)
         {
-            TreeNode result = null;
+            TreeNode result = MergeTrees(t1, t2);
 
-            Assert.Equal(expected, result);
+            CompareTreeNode(expected, result);
+        }
+
+        public TreeNode MergeTrees(TreeNode t1, TreeNode t2)
+        {
+            // 3/29/2020
+            // Comment: I'm surprised that this is in the bottom half for speed. Maybe iterative would be faster? "If this is easy, it probably uses recusan somehow. 
+            // Runtime: 120 ms, faster than 38.80% of C# online submissions for Merge Two Binary Trees.
+            // Memory Usage: 27.8 MB, less than 14.29 % of C# online submissions for Merge Two Binary Trees.
+            if (t1 == null && t2 == null)
+            {
+                return null;
+            }
+            else if (t1 != null && t2 != null)
+            {
+                var merge = new TreeNode(t1.val + t2.val);
+                merge.left = MergeTrees(t1.left, t2.left);
+                merge.right = MergeTrees(t1.right, t2.right);
+                return merge;
+            }
+            else
+            {
+                return t1 ?? t2;
+            }
+        }
+
+        public TreeNode MergeTrees_V2(TreeNode t1, TreeNode t2)
+        {
+            // 3/29/2020 
+            // Comment: I looked at the ideal solution and saw that treating the case where t1 and t2 are null was not needed. 
+            // Runtime: Runtime: 116 ms, faster than 63.86% of C# online submissions for Merge Two Binary Trees.
+            // Memory Usage: 27.8 MB, less than 14.29 % of C# online submissions for Merge Two Binary Trees.
+            if (t1 == null || t2 == null)
+            {
+                return t1 ?? t2;
+            }
+            else
+            {
+                var merge = new TreeNode(t1.val + t2.val);
+                merge.left = MergeTrees(t1.left, t2.left);
+                merge.right = MergeTrees(t1.right, t2.right);
+                return merge;
+            }
         }
 
         public static IEnumerable<object[]> GetMergTwoBinaryTreesData()

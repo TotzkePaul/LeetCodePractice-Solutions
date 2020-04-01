@@ -799,16 +799,68 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-        // 279. Perfect Squares https://leetcode.com/problems/perfect-squares/
+        // 279. Perfect Squares [MEDIUM] https://leetcode.com/problems/perfect-squares/
         // Given a positive integer n, find the least number of perfect square numbers (for example, 1, 4, 9, 16, ...) which sum to n.
         [Theory]
+        [InlineData(1, 1)]
+        [InlineData(2, 2)]
+        [InlineData(4, 1)]
         [InlineData(12, 3)] // Explanation: 12 = 4 + 4 + 4.
-        //[InlineData(13, 2)] // Explanation: 13 = 4 + 9.
+        [InlineData(13, 2)] // Explanation: 13 = 4 + 9.
         public void PerfectSquares(int n, int expected)
         {
-            int ans = 0;
+            int[] cache = new int[n+1];
+            int max = 1;
 
+
+            while (max * max <= n)
+            {
+                int perfect = max * max;
+                cache[perfect] = 1;
+                max++;
+            }
+                
+            int ans = NumSquares(n, cache);
+            
             Assert.Equal(expected, ans);
+        }
+
+        // 3/31/2020 
+        // Comment: I got 3 "Time Limit Exceeded" results so I switched to use cache.
+        // Runtime: 144 ms, faster than 38.66% of C# online submissions for Perfect Squares.
+        // Memory Usage: 17 MB, less than 100.00% of C# online submissions for Perfect Squares.
+        public int NumSquares(int n, int[] cache)
+        {
+            if(cache[n] != 0)
+            {
+                return cache[n]; 
+            }
+            
+
+            int max = 1;
+            int min = n; // The most possible squares is all ones
+
+
+            while (max * max <= n)
+            {
+                int perfect = max * max;
+                int remaining = n - perfect;
+                if(remaining == 0)
+                {
+                    return 1;
+                } 
+                else 
+                {
+                    int current = cache[remaining] != 0 ? cache[remaining] : NumSquares(remaining, cache);
+
+                    cache[remaining] = current;
+                    min = Math.Min(min, 1 + current);
+                }                
+
+                max++;  // lol, max-- also works              
+            }
+
+            return min;
         }
 
         // 75. Sort Colors https://leetcode.com/problems/sort-colors/
@@ -1249,21 +1301,48 @@ namespace LeetCodePractice
         }
 
 
-        // 287. Find the Duplicate Number
+        // 287. Find the Duplicate Number [MEDIUM] https://leetcode.com/problems/find-the-duplicate-number/
         /// <summary>
         /// Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
         /// Note:
-        ///     You must not modify the array(assume the array is read only).
-        ///     You must use only constant, O(1) extra space.
-        ///     Your runtime complexity should be less than O(n^2).
-        ///     There is only one duplicate number in the array, but it could be repeated more than once.
+        ///     1. You must not modify the array(assume the array is read only).
+        ///     2. You must use only constant, O(1) extra space.
+        ///     3. Your runtime complexity should be less than O(n^2).
+        ///     4. There is only one duplicate number in the array, but it could be repeated more than once.
         /// </summary>
         [Theory]
+        [InlineData(new[] { 2, 2, 2, 2, 2 }, 2)] // If only this test fails, then look at note #4
         [InlineData(new[] { 1, 3, 4, 2, 2 }, 2)]
-        //[InlineData(new[] { 3, 1, 3, 4, 2 }, 3)]
+        [InlineData(new[] { 3, 1, 3, 4, 2 }, 3)]
         public void FindTheDuplicateNumber(int[] nums, int expected)
-        {
-            int ans = 0;
+        {           
+            int n = nums.Length-1;
+
+            // Comment: Incomplete. You either know the solution or you don't and I couldn't use trianglar numbers or xor'ing
+            // Interview Note (Spoiler): "As an interviewer, I personally would not expect someone to come up with the cycle detection solution unless they have heard it before."
+
+            // Algorithm:
+            // First off, we can easily show that the constraints of the problem imply that a cycle must exist.Because each number in nums is between 11 and nn, it will necessarily point to an index that exists. 
+            // Therefore, the list can be traversed infinitely, which implies that there is a cycle. Additionally, because 00 cannot appear as a value in nums, nums[0] cannot be part of the cycle. 
+            // Therefore, traversing the array in this manner from nums[0] is equivalent to traversing a cyclic linked list.Given this, the problem can be solved just like Linked List Cycle II.
+
+            // For exactly one duplicate number
+            // The total sum of nums should be: (1+2+3+...+N) + TheDuplicateNumber
+            // Calculate (1+2+3+...+N) by calculating the Nth triangular number: N(N+1)/2
+
+            int total = 0;
+
+            int xor = 0;
+            int compare = 0;
+
+            for(int i = 0; i <= n; i++)
+            {
+                total += nums[i];
+                xor ^= nums[i];
+                compare ^= i;
+            }
+
+            int ans = total - n * (n + 1) / 2; // TheDuplicateNumber
 
             Assert.Equal(expected, ans);
         }
@@ -1333,6 +1412,26 @@ namespace LeetCodePractice
         [InlineData(20, 10946)]
         public void ClimbingStairs_V2(int n, int expected)
         {
+
+
+            //var prePre = 1;
+            //var pre = 2;
+
+            //int cur = 1;
+            //for (int i = 3; i < n; i++)
+            //{
+            //    cur = prePre + pre;
+            //    prePre = pre;
+            //    pre = cur;
+            //}
+
+            //cur = (n == 1) ? 1 : cur;
+
+            //Assert.Equal(expected, cur);
+
+            //return ;
+        
+
             // 3/24/2020
             // I thought the performance would be better by a lot... but the same??? 
             // I guess this would be the most trivial case for Tail Recursion Elimination(aka Unrolling a (recursive) function) in compilers. Like how do people use less memmory than this? 
@@ -1340,18 +1439,18 @@ namespace LeetCodePractice
             // Memory Usage: 14.5 MB, less than 5.88 % of C# online submissions for Climbing Stairs.
 
             int prev2 = 1;
-            int prev1 = 1;
-            int current = 1;
+            int prev1 = 2;
+            int current = 2;
             // If I set current=2 and int i =3; I get the following performance: Runtime: 36 ms, faster than 92.58% of C# online submissions for Climbing Stairs. 
 
-            for (int i = 2; i <= n; i++)
+            for (int i = 2; i < n; i++)
             {
                 current = prev2 + prev1;
                 prev2 = prev1;
                 prev1 = current;
             }
 
-            int ans = current;
+            int ans = (n==1) ? 1 :  current;
 
             Assert.Equal(expected, ans);
         }
