@@ -120,5 +120,47 @@ namespace LeetCodePractice
                 new object[] { "Bob hit a ball, the hit BALL flew far after it was hit.", new string[] { "hit" }, "ball" },
             };
         }
+
+
+        // Day 2 of 30-Day LeetCoding Challenge https://leetcode.com/explore/featured/card/30-day-leetcoding-challenge/528/week-1/3284/
+        // 202. Happy Number https://leetcode.com/problems/happy-number/
+        // Write an algorithm to determine if a number is "happy".
+        // A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits, 
+        //and repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process ends in 1 are happy numbers.
+        [Theory]
+        [InlineData(19, true)]
+        [InlineData(82, true)]
+        [InlineData(16, false)]
+        public void HappyNumber(int n, bool expected)
+        {
+            // 4/2/2020
+            // Runtime: 44 ms (beats 58.59% of C# submissions)
+            // Memory Usage: 16.7 MB
+            bool ans = false;
+
+            HashSet<int> seen = new HashSet<int>();
+
+            int current = n;
+
+            while (!seen.Contains(current) && current != 1)
+            {
+                seen.Add(current);
+
+                int next = 0;
+                int temp = current;
+                while (temp != 0)
+                {
+                    int digit = temp % 10;
+                    temp = temp / 10;
+                    next += digit * digit; 
+                }
+
+                current = next;
+            }
+
+            ans = current == 1;
+
+            Assert.Equal(expected, ans);
+        }
     }
 }
