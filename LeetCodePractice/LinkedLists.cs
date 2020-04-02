@@ -340,7 +340,20 @@ namespace LeetCodePractice
         [MemberData(nameof(GetReverseLinkedListData))]
         public void ReverseLinkedList(ListNode head, ListNode expected)
         {
-            ListNode result = new ListNode(0);
+            // Runtime: 100 ms, faster than 11.92% of C# online submissions for Reverse Linked List.
+            // Memory Usage: 24.6 MB, less than 8.00 % of C# online submissions for Reverse Linked List.
+            ListNode headptr = head;
+            ListNode current = head;
+            while (current.next != null)
+            {
+                ListNode prev = current.next;
+                current.next = prev.next;
+                prev.next = headptr;
+                headptr = prev;
+            }
+            
+
+            ListNode result = headptr;
 
             CompareListNode(expected, result);
         }
@@ -351,7 +364,7 @@ namespace LeetCodePractice
             // Output: 5->4->3->2->1->NULL
             return new[]
             {
-                new object[] { new ListNode(1) { next = new ListNode(2) { next = new ListNode(4) } }, new ListNode(1) { next = new ListNode(3) { next = new ListNode(4) } }, new ListNode(1) { next = new ListNode(1) { next = new ListNode(2) { next = new ListNode(3) { next = new ListNode(4) { next = new ListNode(4) } } } } } },
+                new object[] { new ListNode(1) { next = new ListNode(2) { next = new ListNode(3) { next = new ListNode(4) { next = new ListNode(5) } } } } ,  new ListNode(5) { next = new ListNode(4) { next = new ListNode(3) { next = new ListNode(2) { next = new ListNode(1) } } } } },
             };
         }
     }

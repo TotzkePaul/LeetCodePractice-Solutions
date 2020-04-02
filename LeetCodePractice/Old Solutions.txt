@@ -1,0 +1,136 @@
+// https://leetcode.com/submissions/detail/198008151/
+// Runtime: 508 ms
+// Memory Usage: 45.1 MB
+// Submitted: 1 year, 3 months ago
+
+
+public class Solution {
+    
+    
+    
+    public class Node<T>
+        {
+            public T Data { get; set; }
+            public Dictionary<T,Node<T>> Children { get; set; }
+            public List<string> CompletedWords { get; set; }
+            public Node(T data)
+            {
+                Data = data;
+                Children = new Dictionary<T, Node<T>>();
+                CompletedWords = new List<string>();
+            }
+        }
+
+        public string[] Spellchecker(string[] wordlist, string[] queries)
+        {
+            List<string> list = new List<string>();
+            Node<char> root = new Node<char>('*');
+            List<char> vowels = new List<char>{'a','e', 'i', 'o', 'u'};
+
+            foreach (string word in wordlist)
+            {
+                var current = root;
+                for (int i = 0; i < word.Length; i++)
+                {
+                    char key = vowels.Contains(Char.ToLower(word[i])) ? '$' : Char.ToLower(word[i]);
+
+                    if (current.Children.ContainsKey(key))
+                    {
+                        current = current.Children[key];
+                    }
+                    else
+                    {
+                        var temp = new Node<char>(key);
+                        current.Children.Add(key, temp);
+                        current = temp;
+                    }
+                    
+                }
+
+                current.CompletedWords.Add(word);
+            }
+
+            for (var index = 0; index < queries.Length; index++)
+            {
+                string query = queries[index];
+                var current = root;
+                bool isNotFound = true;
+                int i;
+                for (i = 0; i < query.Length; i++)
+                {
+                    char key = vowels.Contains(Char.ToLower(query[i])) ? '$' : Char.ToLower(query[i]);
+
+                    if (current.Children.ContainsKey(key))
+                    {
+                        current = current.Children[key];
+                    }
+                    else
+                    {
+                        isNotFound = false;
+                        break;
+                    }
+                }
+
+                
+                if (isNotFound)
+                {
+                    var match = current.CompletedWords.FirstOrDefault(x => string.Equals(x, query, StringComparison.InvariantCulture)) ??
+                                current.CompletedWords.FirstOrDefault(x => string.Equals(x, query, StringComparison.InvariantCultureIgnoreCase)) ??
+                                current.CompletedWords.FirstOrDefault() ?? "";
+
+                    list.Add(match);
+                }
+                else
+                {
+                    list.Add("");
+                }
+                
+
+                    
+            }
+
+            return list.ToArray();
+        }
+}
+
+
+
+//=============================
+
+// 34 / 34 test cases passed. Submitted: 8 months ago
+// Status: Accepted
+// Runtime: 84 ms
+// Memory Usage: 22 MB
+
+public class Solution {
+    public bool IsAnagram(string s, string t) {
+        if(s.Length != t.Length){
+            return false;
+        }
+        
+        int len = s.Length;
+        Dictionary<char, int> dict = new Dictionary<char, int>();
+        
+        for(int i = 0; i < len; i++){
+            if(dict.ContainsKey(s[i]) ){
+                dict[s[i]]++;
+            } else {
+                dict[s[i]] = 1;
+            }
+            
+            if(dict.ContainsKey(t[i]) ){
+                dict[t[i]]--;
+            } else {
+                dict[t[i]] = -1;
+            }
+        }
+        
+        for(int i = 0; i < len; i++){
+            if(dict[s[i]] != 0){
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}

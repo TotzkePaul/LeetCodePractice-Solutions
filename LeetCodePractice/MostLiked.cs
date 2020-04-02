@@ -530,6 +530,65 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
+        // Version from 8 months ago
+        // Runtime: 80 ms
+        // Memory Usage: 20.2 MB
+
+        //public bool IsValid(string s)
+        //{
+
+        //    Stack<char> stk = new Stack<char>();
+
+        //    for (int i = 0; i < s.Length; i++)
+        //    {
+        //        switch (s[i])
+        //        {
+        //            case '(':
+
+        //            case '{':
+
+        //            case '[':
+        //                stk.Push(s[i]);
+        //                break;
+        //            case ')':
+        //                if (stk.Any() && stk.Peek() == '(')
+        //                {
+        //                    stk.Pop();
+        //                }
+        //                else
+        //                {
+        //                    return false;
+        //                }
+        //                break;
+        //            case '}':
+        //                if (stk.Any() && stk.Peek() == '{')
+        //                {
+        //                    stk.Pop();
+        //                }
+        //                else
+        //                {
+        //                    return false;
+        //                }
+        //                break;
+        //            case ']':
+        //                if (stk.Any() && stk.Peek() == '[')
+        //                {
+        //                    stk.Pop();
+        //                }
+        //                else
+        //                {
+        //                    return false;
+        //                }
+        //                break;
+        //            default:
+        //                return false;
+        //        }
+        //    }
+
+        //    return !stk.Any();
+        //}
+
+
 
         // 139. Word Break https://leetcode.com/problems/word-break/
         /// <summary>
@@ -780,9 +839,34 @@ namespace LeetCodePractice
         //      The range of numbers in the array is [-1000, 1000] and the range of the integer k is [-1e7, 1e7].
         [Theory]
         [InlineData(new int[] { 1, 1, 1 }, 2, 2)]
+        [InlineData(new int[] { 1, 1, 1, 5, 1, 1, 1 }, 2, 4)]
         public void SubarraySumEqualsK(int[] nums, int k, int expected)
         {
+            // 4/1/2020 5 Builds and 1 Submit [[Brute Force]
+            // Comment: I couldn't think of a better way to manage the start-end window (O(n^2) --> O(n))
+            // Runtime: 664 ms, faster than 28.86% of C# online submissions for Subarray Sum Equals K.
+            // Memory Usage: 27.5 MB, less than 25.00 % of C# online submissions for Subarray Sum Equals K.
+
             int ans = 0;
+
+            int start = 0;
+
+            while (start < nums.Length)
+            {
+                int end = start;
+                int sum = 0;
+                
+                while (end < nums.Length)
+                {
+                    sum += nums[end];
+                    if(sum == k)
+                    {
+                        ans++;
+                    }
+                    end++;
+                }
+                start++;
+            }
 
             Assert.Equal(expected, ans);
         }
