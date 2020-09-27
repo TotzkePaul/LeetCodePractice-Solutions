@@ -39,9 +39,28 @@ namespace LeetCodePractice
         [MemberData(nameof(GetValidateBinarySearchTreeData))]
         public void ValidateBinarySearchTree(TreeNode root, bool expected)
         {
-            bool result = false;
+            bool result = IsValidBST(root, root.val, root.val);
 
             Assert.Equal(expected, result);
+        }
+
+        public bool IsValidBST(TreeNode root, int min, int max) // min/max params?
+        {
+            if (root == null) return true;
+
+            if(root.left != null)
+            {
+                min = Math.Min(root.left.val, min);
+                max = (root.right == null) ? max : Math.Max(root.right.val, max);
+                return root.left.val < root.val && (root.right == null || (root.val < root.right.val && IsValidBST(root.right, min, max ))) && IsValidBST(root.left, min, max);
+            } else if(root.right != null)
+            {
+                max = Math.Max(root.right.val, max);
+                return root.val < root.right.val && IsValidBST(root.right, min, max);
+            } else
+            {
+                return true;
+            }
         }
 
         public static IEnumerable<object[]> GetValidateBinarySearchTreeData()
@@ -57,7 +76,9 @@ namespace LeetCodePractice
                   //1   4
                   //   / \
                   //  3   6
-                new object[] { new TreeNode(5) { left = new TreeNode(1), right = new TreeNode(4) { left = new TreeNode(3), right = new TreeNode(6) } }, false }
+                new object[] { new TreeNode(5) { left = new TreeNode(1), right = new TreeNode(4) { left = new TreeNode(3), right = new TreeNode(6) } }, false },
+
+                new object[] { new TreeNode(10) { left = new TreeNode(5), right = new TreeNode(15) { left = new TreeNode(6), right = new TreeNode(20) } }, false }
             };            
         }
 

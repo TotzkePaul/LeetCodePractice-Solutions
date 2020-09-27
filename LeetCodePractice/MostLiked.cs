@@ -157,15 +157,123 @@ namespace LeetCodePractice
         /// There are two sorted arrays nums1 and nums2 of size m and n respectively.
         /// Find the median of the two sorted arrays.The overall run time complexity should be O(log (m+n)).
         /// You may assume nums1 and nums2 cannot be both empty.
+        /// 
+        /// Follow up: The overall run time complexity should be O(log (m+n)). 
         /// </summary>
         [Theory]
         [InlineData(new int[] { 1, 3 }, new int[] { 2 }, 2.0)] // The median is 2.0
+        [InlineData(new int[] { 0, 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8, 9 }, 4.5)]
+        [InlineData(new int[] { 0, 1, 2, 8, 9 }, new int[] { 3, 4, 5, 6, 7 }, 4.5)]
         //[InlineData(new int[] { 1, 2 }, new int[] { 3, 4 }, 2.5)] // The median is (2 + 3)/2 = 2.5
         public void MedianOfTwoSortedArrays(int[] nums1, int[] nums2, double expected)
         {
-            double ans = 0.0;
+            int total = (nums1.Length + nums2.Length);
 
-            Assert.Equal(expected, ans);
+            if(total % 2 == 0)
+            {
+                int lilMedian_Target = total / 2;
+
+                int bigMedian_Target = total / 2 + 1;
+
+                int lilMedian = kth(nums1, nums2, lilMedian_Target, 0, 0);
+
+                int bigMedian = kth(nums1, nums2, bigMedian_Target, 0, 0);
+
+
+                double ans = (lilMedian + bigMedian) / 2.0;
+
+
+                Assert.Equal(expected, ans);
+            } else
+            {
+                int median_Target = total / 2 +1;
+
+
+                int median = kth(nums1, nums2, median_Target, 0, 0);
+
+
+                double ans = median;
+
+
+                Assert.Equal(expected, ans);
+            }
+
+            
+        }
+
+
+        //https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/
+        public int kth(int[] arr1, int[] arr2, int k, int st1, int st2)
+        {
+            //think of st meaning starting point of the "new array"
+            // 
+            int m = arr1.Length;
+            int n = arr2.Length;
+
+            // In case we have reached end of array 1 
+            if (st1 == m)
+            {
+                return arr2[st2 + k - 1];
+            }
+
+            // In case we have reached end of array 2 
+            if (st2 == n)
+            {
+                return arr1[st1 + k - 1];
+            }
+
+            // Error State: k should never reach 0 or exceed sizes of arrays 
+            if (k == 0 || k > (m - st1) + (n - st2))
+            {
+                return -1;
+            }
+
+            // Compare first elements of arrays and return 
+            if (k == 1)
+            {
+                return (arr1[st1] < arr2[st2])? arr1[st1] : arr2[st2];
+            }
+
+            var midK = k / 2;
+            var midKIndex = midK - 1;
+
+            // Size of array 1 is less than k / 2 
+            if (midKIndex >= m - st1)
+            {
+                // Last element of array 1 is not kth. We can directly return the (k - m)th element in array 2 
+                if (arr1[m - 1] < arr2[st2 + midKIndex])
+                {
+                    return arr2[st2 + (k - (m - st1) - 1)];
+                }
+                else
+                {
+                    return kth(arr1, arr2, k - midK, st1, st2 + midK);
+                }
+            }
+
+            // Size of array 2 is less than k / 2 
+            if (midKIndex >= n - st2)
+            {
+                if (arr2[n - 1] < arr1[st1 + midKIndex])
+                {
+                    return arr1[st1 + (k - (n - st2) - 1)];
+                }
+                else
+                {
+                    return kth(arr1, arr2, k - midK, st1 + midK, st2);
+                }
+            }
+            else
+
+            // Normal comparison, move starting index of one array k / 2 to the right 
+            if (arr1[midK + st1 - 1] < arr2[midK + st2 - 1])
+            {
+                return kth(arr1, arr2, k - midK, st1 + midK, st2);
+            }
+            else
+            {
+                return kth(arr1, arr2, k - midK, st1, st2 + midK);
+            }
         }
 
 
@@ -173,13 +281,78 @@ namespace LeetCodePractice
         // Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
         [Theory]
         [InlineData("babad", "bab")] // Note: "aba" is also a valid answer.
-        //[InlineData("cbbd", "bb")]
+        [InlineData("abacaba", "abacaba")]
+        [InlineData("abaccaba", "abaccaba")]
+        [InlineData("abacabagg", "abacaba")]
+        [InlineData("ggabacaba", "abacaba")]
+        [InlineData("abaccabagg", "abaccaba")]
+        [InlineData("hhabaccabagg", "abaccaba")]
+        [InlineData("cbbd", "bb")]
+        [InlineData("cbbbd", "bbb")]
+        [InlineData("a", "a")]
+        [InlineData("aa", "aa")]
+        [InlineData("aaa", "aaa")]
+        [InlineData("aaaa", "aaaa")]
+        [InlineData("bananas", "anana")]
         public void LongestPalindromicSubstring(string s, string expected)
         {
-            string ans = "";
+            string ans;
+            if (s.Length <= 1)
+            {
+                ans = s;
+            } 
+            else
+            {
+                int[] max = new int[s.Length];
+                max[0] = 1;
+
+                int maxRightLength = 1;
+                int maxRightIndex = 1;
+
+                int streak = 1; 
+
+                for (int i = 1; i < s.Length; i++)
+                {
+                    int prev = max[i - 1];
+
+                    int left = i - prev - 1;
+
+
+
+                    if (left >= 0 && s[i] == s[left])
+                    {
+                        max[i] = prev + 2;
+                    }
+                    else if (s[i] == s[i - 1])
+                    {
+                        streak++;
+                        max[i] = streak;
+                    }
+                    else
+                    {
+                        streak = 1;
+                        max[i] = 1;
+                    }
+
+                    maxRightLength = Math.Max(maxRightLength, max[i]);
+                    if (maxRightLength == max[i])
+                        maxRightIndex = i;
+                }
+
+                ans = s.Substring(maxRightIndex - maxRightLength + 1, maxRightLength);
+            }
 
             Assert.Equal(expected, ans);
         }
+
+
+        //public string LongestPalindrome(string s, int[] longest, int index)
+        //{
+        //    if(index == s.Length)
+        //    {
+
+        //    }
+        //}
 
         // 3. Longest Substring Without Repeating Characters https://leetcode.com/problems/longest-substring-without-repeating-characters/
         // Given a string, find the length of the longest substring without repeating characters.
@@ -771,18 +944,34 @@ namespace LeetCodePractice
         // Follow up: Could you improve it to O(n log n) time complexity?
         [Theory]
         [InlineData(new int[] { 10, 9, 2, 5, 3, 7, 101, 18 }, 4)] // Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4. 
-        public void LongestIncreasingSubsequence(int[] heights, int expected)
+        [InlineData(new int[] { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, 1)]
+        [InlineData(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, 10)]
+        public void LongestIncreasingSubsequence(int[] nums, int expected)
         {
-            int ans = 0;
+            int max = 0;
 
-            Stack<List<int>> stack = new Stack<List<int>>();
+            //lis is the longest increasing subsequence for the subarray of nums from 0 to i where nums[i] is the largest number
+            int[] lis = new int[nums.Length];
+            for (int i = 0; i < lis.Length; i++)
+                lis[i] = 1;
 
-            for(int i = 0; i < heights.Length; i++)
+            for (int i = 1; i < nums.Length; i++)
             {
-
+                for (int j = 0; j < i; j++)
+                {
+                    if (nums[i] > nums[j] && lis[i] < lis[j] + 1)
+                    {
+                        lis[i] = lis[j] + 1;
+                    }
+                }
             }
 
-            Assert.Equal(expected, ans);
+            for (int i = 0; i < nums.Length; i++)
+                if (max < lis[i])
+                    max = lis[i];
+
+
+            Assert.Equal(expected, max);
         }
 
         // 416. Partition Equal Subset Sum https://leetcode.com/problems/partition-equal-subset-sum/
@@ -842,7 +1031,8 @@ namespace LeetCodePractice
         [InlineData(new int[] { 1, 1, 1, 5, 1, 1, 1 }, 2, 4)]
         public void SubarraySumEqualsK(int[] nums, int k, int expected)
         {
-            // 4/1/2020 5 Builds and 1 Submit [[Brute Force]
+            // 4/1/2020 5 Builds and 1 Submit. My solution is similar to "Approach #3 Without space [Accepted].  Time complexity : O(n^2)  Space complexity : O(1) [Approach #4 is O(n) for Time and Space ]
+            // The Brute force version (TLE) is when you calculate the sum  every iteration. 
             // Comment: I couldn't think of a better way to manage the start-end window (O(n^2) --> O(n))
             // Runtime: 664 ms, faster than 28.86% of C# online submissions for Subarray Sum Equals K.
             // Memory Usage: 27.5 MB, less than 25.00 % of C# online submissions for Subarray Sum Equals K.
@@ -1443,11 +1633,34 @@ namespace LeetCodePractice
         /// </summary>
         [Theory]
         [InlineData(new[] { 1, 1, 1, 1, 1 }, 3, 5)]
-        public void TargetSum(int[] nums, int s, int expected)
+        [InlineData(new[] { 1, 1, 1, 1, 1, 1 }, 4, 6)]
+        public void FindTargetSumWays(int[] nums, int S, int expected)
         {
-            int ans = 0;
+            int ans = TargetSum(nums, S, 0, 0, new Dictionary<Tuple<int,int>, int>());
 
             Assert.Equal(expected, ans);
+        }
+
+        private int TargetSum(int[] nums, int targetSum, int index, int currentSum, Dictionary<Tuple<int, int>, int> dic)
+        {
+            // I've calculated this before so resuse the previous answer
+            if (dic.ContainsKey(Tuple.Create(index, currentSum)))
+            {
+                return dic[Tuple.Create(index, currentSum)];
+            }
+
+            // Did the whole sum get us to the target?
+            if (index == nums.Length)
+            {
+                return (currentSum == targetSum) ? 1 : 0;
+            }
+            else
+            {
+                int count = TargetSum(nums, targetSum, index + 1, currentSum + nums[index], dic);
+                count += TargetSum(nums, targetSum, index + 1, currentSum - nums[index], dic);
+                dic[Tuple.Create(index, currentSum)] = count;
+                return count;
+            }
         }
 
 
@@ -1596,13 +1809,60 @@ namespace LeetCodePractice
         /// After you sell your stock, you cannot buy stock on next day. (ie, cooldown 1 day)
         /// </summary>
         [Theory]
+        [InlineData(new[] { 1, 2, 3, 0, 1, 2, 3, 4,3,4,3,0,4 }, 9)]
         [InlineData(new[] { 1, 2, 3, 0, 2 }, 3)] // Explanation: transactions = [buy, sell, cooldown, buy, sell]
+        [InlineData(new[] { -6, -7, -5, 1, 2, 3, 0, 2 }, 11)]
+        //[InlineData(new[] { 1, 7 }, 6)]
         public void BestTimeToBuyAndSellStockWithCooldown(int[] prices, int expected)
         {
-            int ans = 0;
+            int ans = MaxProfit1(prices);
 
             Assert.Equal(expected, ans);
         }
+
+        // Credit to YaoFrankie:  https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/discuss/75931/Easiest-JAVA-solution-with-explanations/564953
+        public int MaxProfit1(int[] prices)
+        {
+            if (prices == null || prices.Length <= 1) return 0;
+
+            // buy[i] is the max profit ending at index i where the last action is a buy
+            // sell[i] is the max profit ending at index i where the last action is a sell
+            int[] buy = new int[prices.Length];
+            int[] sell = new int[prices.Length];
+
+            buy[0] = -prices[0];
+            buy[1] = -Math.Min(prices[0], prices[1]); // alternative: buy[1] = Math.Max(buy[0], -prices[1]);
+
+            sell[1] = Math.Max(0, buy[0] + prices[1]);
+
+            for (int i = 2; i < prices.Length; i++)
+            {
+                // buy[i] either propagates the previous buy or  
+                buy[i] = Math.Max(buy[i - 1], sell[i - 2] - prices[i]);
+                
+                sell[i] = Math.Max(sell[i - 1], buy[i - 1] + prices[i]);
+            }
+            return sell[sell.Length-1];
+        }
+
+        // Credit to yavinci: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/discuss/75931/Easiest-JAVA-solution-with-explanations
+        public int MaxProfit(int[] prices)
+        {
+            if (prices == null || prices.Length <= 1) return 0;
+
+            int b0 = -prices[0], b1 = b0;
+            int s0 = 0, s1 = 0, s2 = 0;
+
+            for (int i = 1; i < prices.Length; i++)
+            {
+                b0 = Math.Max(b1, s2 - prices[i]);
+                s0 = Math.Max(s1, b1 + prices[i]);
+                b1 = b0; s2 = s1; s1 = s0;
+            }
+            return s0;
+        }
+
+        
 
 
         // 1. Two Sum https://leetcode.com/problems/two-sum/
@@ -1637,13 +1897,39 @@ namespace LeetCodePractice
         // Note: You may assume k is always valid, 1 <= k <= array's length.
         [Theory]
         [InlineData(new[] { 3, 2, 1, 5, 6, 4 }, 2, 5)]
-        //[InlineData(new[] { 3, 2, 3, 1, 2, 4, 5, 5, 6 }, 4, 4)]
+        [InlineData(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 9, 1)]
         public void KthLargestElement(int[] nums, int k, int expected)
         {
-            int ans = 0;
+            //Current Runtime: O(k) space and O(n*k)
+            int ans = FindKthLargest(nums, k);            
 
             Assert.Equal(expected, ans);
         }
 
+
+        // Naive 
+        public int FindKthLargest(int[] nums, int k)
+        {
+            int?[] biggest = new int?[k];
+            for (int i = 0; i < nums.Length; i++)
+            {
+                for (int j = 0; j < k; j++)
+                {
+                    if (biggest[j] == null || nums[i] > biggest[j])
+                    {
+                        // move all smaller numbers right by one
+                        for (int n = k-1; n > j ; n--)
+                        {
+                            biggest[n] = biggest[n-1];
+                        }
+                        
+                        biggest[j] = nums[i];
+                        break;
+                    }
+                }
+            }
+
+            return biggest[k-1].Value;
+        }
     }
 }
