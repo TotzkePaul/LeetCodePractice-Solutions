@@ -345,24 +345,39 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
-
-        //public string LongestPalindrome(string s, int[] longest, int index)
-        //{
-        //    if(index == s.Length)
-        //    {
-
-        //    }
-        //}
-
-        // 3. Longest Substring Without Repeating Characters https://leetcode.com/problems/longest-substring-without-repeating-characters/
+        // 3. Longest Substring Without Repeating Characters [Medium] https://leetcode.com/problems/longest-substring-without-repeating-characters/
         // Given a string, find the length of the longest substring without repeating characters.
+        // Runtime: 76 ms, faster than 97.21% of C# online submissions for Longest Substring Without Repeating Characters. (After removing extra varibles)
+        // Memory Usage: 26.3 MB, less than 5.00% of C# online submissions for Longest Substring Without Repeating Characters.
         [Theory]
         [InlineData("abcabcbb", 3)] // Explanation: The answer is "abc", with the length of 3. 
-        //[InlineData("bbbbb", 1)] // Explanation: The answer is "b", with the length of 1.
-        //[InlineData("pwwkew", 3)] // Explanation: The answer is "wke", with the length of 3. Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+        [InlineData("bbbbb", 1)] // Explanation: The answer is "b", with the length of 1.
+        [InlineData("pwwkew", 3)] // Explanation: The answer is "wke", with the length of 3. Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+        [InlineData("abcdefgabcdefgabcdefgabcdefg", 7)]
+        [InlineData("abcde", 5)]
+        [InlineData("abba", 2)]
+        [InlineData(" ", 1)]
+        [InlineData("", 0)]
         public void LongestSubstringWithoutRepeatingCharacters(string s, int expected)
         {
-            int ans = 0;
+            Dictionary<char, int> lastSeen = new Dictionary<char, int>();
+
+            int start = 0; //start of current string
+            int max = 0;
+
+            for(int i = 0; i < s.Length; i++)
+            {
+                if (lastSeen.ContainsKey(s[i]))
+                {
+                    start = Math.Max(start, lastSeen[s[i]]+1); // example: abba
+                }
+
+                lastSeen[s[i]] = i;
+                int currentLength = (i + 1) - start;
+                max = Math.Max(max, currentLength);
+            }
+
+            int ans = max;
 
             Assert.Equal(expected, ans);
         }
