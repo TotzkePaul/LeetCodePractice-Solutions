@@ -4,12 +4,15 @@ using Xunit;
 
 namespace LeetCodePractice
 {
-    // 146. LRU Cache https://leetcode.com/problems/lru-cache/
+    // 981. Time Based Key-Value Store https://leetcode.com/problems/time-based-key-value-store/
     /*
-     * Design and implement a data structure for Least Recently Used (LRU) cache. It should support the following operations: get and put.
-     * get(key) - Get the value (will always be positive) of the key if the key exists in the cache, otherwise return -1.
-     * put(key, value) - Set or insert the value if the key is not already present. When the cache reached its capacity, it should invalidate the least recently used item before inserting a new item.
-     * The cache is initialized with a positive capacity.
+     * Design a time-based key-value data structure that can store multiple values for the same key at different time stamps and retrieve the key's value at a certain timestamp.
+     * 
+     * Implement the TimeMap class:
+     * TimeMap() Initializes the object of the data structure.
+     * void set(String key, String value, int timestamp) Stores the key key with the value value at the given time timestamp.
+     * String get(String key, int timestamp) Returns a value such that set was called previously, with timestamp_prev <= timestamp. 
+     * If there are multiple such values, it returns the value associated with the largest timestamp_prev. If there are no values, it returns "".
      */
     public class TimeMapUnitTests
     {
