@@ -54,8 +54,8 @@ namespace LeetCodePractice
             Assert.Equal("low", t4);
         }
     }
-    // Runtime: 820 ms, faster than 87.67% of C# online submissions for Time Based Key-Value Store.
-    // Memory Usage: 106.8 MB, less than 52.33% of C# online submissions for Time Based Key-Value Store.
+    // Runtime: 788 ms, faster than 99.00% of C# online submissions for Time Based Key-Value Store.
+    // Memory Usage: 107.1 MB, less than 41.00% of C# online submissions for Time Based Key-Value Store.
     public class TimeMap
     {
 
@@ -68,27 +68,23 @@ namespace LeetCodePractice
 
         public void Set(string key, string value, int timestamp)
         {
-            if (store.ContainsKey(key))
+            if (!store.ContainsKey(key))
             {
-                store[key].Add((timestamp, value));
-            } else
-            {
-                store[key] = new List<(int, string)> { (timestamp, value) };
+                store[key] = new List<(int, string)>();
             }
-            
+            store[key].Add((timestamp, value));
         }
 
         public string Get(string key, int timestamp)
         {
             if (store.ContainsKey(key))
             {
-                var arr = store[key];
-                if (timestamp < arr[0].Timestamp)
+                if (timestamp < store[key][0].Timestamp)
                 {
                     return string.Empty;
                 }
-                int idx = BinarySearch(arr, timestamp);
-                return arr[idx].Result;
+                int idx = BinarySearch(store[key], timestamp);
+                return store[key][idx].Result;
             }
 
             return string.Empty;
@@ -109,8 +105,7 @@ namespace LeetCodePractice
                 if (arr[mid].Timestamp == target)
                 {
                     return mid;
-                }
-                else if (target < arr[mid].Timestamp)
+                } else if (target < arr[mid].Timestamp)
                 {
                     min = mid + 1;
                 }
