@@ -152,6 +152,29 @@ namespace LeetCodePractice
             Assert.Equal(expected, ans);
         }
 
+        [Theory]
+        [InlineData("MMXX", 2020)]
+        [InlineData("MMXX", 2020)]
+        [InlineData("MMXX", 2020)] // Converts "MMMXX" to "2020"
+        public void RomanToInt(string roman, int expected)
+        {
+            int ans = 0;
+            int[] values = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+
+            string[] nums = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
+            for (int i = 0; i < roman.Length; i++)
+            {
+                int val = values[Array.IndexOf(nums, roman[i].ToString())];
+                if (i < roman.Length -1 && values[Array.IndexOf(nums, roman[i + 1].ToString())] > val)
+                {
+                    val = -val;
+                }
+                ans += val;
+            }
+
+            Assert.Equal(expected, ans);
+        }
+
         // 4. Median of Two Sorted Arrays [HARD] https://leetcode.com/problems/median-of-two-sorted-arrays/
         /// <summary>
         /// There are two sorted arrays nums1 and nums2 of size m and n respectively.
