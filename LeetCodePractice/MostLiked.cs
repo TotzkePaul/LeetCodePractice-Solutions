@@ -429,11 +429,47 @@ namespace LeetCodePractice
         ///     Then length of the input array is in range[1, 10, 000].
         ///     The input array may contain duplicates, so ascending order here means <=.
         /// </summary>
+        /// Runtime: 112 ms, faster than 97.18% of C# online submissions for Shortest Unsorted Continuous Subarray.
+        /// Memory Usage: 32.5 MB, less than 66.20% of C# online submissions for Shortest Unsorted Continuous Subarray.
         [Theory]
         [InlineData(new int[] { 2, 6, 4, 8, 10, 9, 15 }, 5)]
+        [InlineData(new int[] { 1, 5, 6, 7, 2, 8, 10 }, 4)]
         public void ShortestUnsortedContinuousSubarray(int[] nums, int expected)
         {
-            int ans = 0;
+            int min = int.MaxValue;
+            int max = int.MinValue;
+
+            // start and end indices of Unsorted Subarray
+            int start = 0;
+            int end = -1; // if array is sorted, start = 0 and end = -1 so start + end + 1 => 0
+
+            // left and right are points for scanning nums 
+            int right = nums.Length - 1;
+
+            for (int left = 0; left < nums.Length; left++)
+            {
+                if (nums[left] >= max)
+                {
+                    max = nums[left];
+                }
+                else
+                {
+                    end = left;
+                }
+
+                if (nums[right] <= min)
+                {
+                    min = nums[right];
+                }
+                else
+                {
+                    start = right;
+                }
+
+                right--;
+            }
+
+            int ans = end - start +1;
 
             Assert.Equal(expected, ans);
         }
