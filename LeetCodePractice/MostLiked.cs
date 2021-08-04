@@ -443,8 +443,7 @@ namespace LeetCodePractice
             int start = 0;
             int end = -1; // if array is sorted, start = 0 and end = -1 so start + end + 1 => 0
 
-            // left and right are points for scanning nums 
-            int right = nums.Length - 1;
+            // scan left to right; end is the index of the last value with a greater number before it
 
             for (int left = 0; left < nums.Length; left++)
             {
@@ -456,7 +455,11 @@ namespace LeetCodePractice
                 {
                     end = left;
                 }
+            }
 
+            // scan right to left; start is the index of the first value with a lesser number after it
+            for (int right = nums.Length-1; right >= 0; right--)
+            {
                 if (nums[right] <= min)
                 {
                     min = nums[right];
@@ -465,8 +468,6 @@ namespace LeetCodePractice
                 {
                     start = right;
                 }
-
-                right--;
             }
 
             int ans = end - start +1;
