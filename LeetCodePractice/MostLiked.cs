@@ -492,9 +492,7 @@ namespace LeetCodePractice
             {
                 while ( 0 < nums[i] && nums[i] < nums.Length && nums[i] != nums[nums[i]-1])
                 {
-                    int temp = nums[i];
-                    nums[i] = nums[nums[i] - 1];
-                    nums[temp - 1] = temp;
+                    (nums[i], nums[nums[i] - 1]) = (nums[nums[i] - 1], nums[i]);
                 }
             }
 
