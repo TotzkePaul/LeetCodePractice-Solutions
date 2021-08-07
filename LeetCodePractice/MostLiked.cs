@@ -429,6 +429,7 @@ namespace LeetCodePractice
         ///     Then length of the input array is in range[1, 10, 000].
         ///     The input array may contain duplicates, so ascending order here means <=.
         /// </summary>
+        /// Results are for the 1 for loop version:
         /// Runtime: 112 ms, faster than 97.18% of C# online submissions for Shortest Unsorted Continuous Subarray.
         /// Memory Usage: 32.5 MB, less than 66.20% of C# online submissions for Shortest Unsorted Continuous Subarray.
         [Theory]
@@ -478,13 +479,35 @@ namespace LeetCodePractice
         // 41. First Missing Positive [HARD] https://leetcode.com/problems/first-missing-positive/
         // Given an unsorted integer array, find the smallest missing positive integer.
         // Note: Your algorithm should run in O(n) time and uses constant extra space.
+        // Runtime: 248 ms, faster than 55.28% of C# online submissions for First Missing Positive.
+        // Memory Usage: 47.1 MB, less than 58.45% of C# online submissions for First Missing Positive.
         [Theory]
         [InlineData(new int[] { 1, 2, 0 }, 3)]
-        //[InlineData(new int[] { 3, 4, -1, 1 }, 2)]
-        //[InlineData(new int[] { 7, 8, 9, 11, 12 }, 1)]
+        [InlineData(new int[] { 3, 4, -1, 1 }, 2)]
+        [InlineData(new int[] { 7, 8, 9, 11, 12 }, 1)]
+        [InlineData(new int[] { -2, -2, -3, 8, 1, 7, 2, 6, 3, 5, 4 }, 9)]
         public void FirstMissingPositive(int[] nums, int expected)
         {
-            int ans = 0;
+            for(int i =0; i<nums.Length; i++)
+            {
+                while ( 0 < nums[i] && nums[i] < nums.Length && nums[i] != nums[nums[i]-1])
+                {
+                    int temp = nums[i];
+                    nums[i] = nums[nums[i] - 1];
+                    nums[temp - 1] = temp;
+                }
+            }
+
+            int ans = nums.Length+1;
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[i] != i + 1)
+                {
+                    ans = i + 1;
+                    break;
+                }
+            }
 
             Assert.Equal(expected, ans);
         }
