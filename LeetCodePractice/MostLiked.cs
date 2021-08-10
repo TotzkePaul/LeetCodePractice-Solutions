@@ -512,12 +512,34 @@ namespace LeetCodePractice
 
         // 152. Maximum Product Subarray https://leetcode.com/problems/maximum-product-subarray/
         // Given an integer array nums, find the contiguous subarray within an array (containing at least one number) which has the largest product.
+        // Runtime: 92 ms, faster than 71.13% of C# online submissions for Maximum Product Subarray.
+        // Memory Usage: 25.4 MB, less than 44.88% of C# online submissions for Maximum Product Subarray.
         [Theory]
         [InlineData(new int[] { 2, 3, -2, 4 }, 6)] // Explanation: [2,3] has the largest product 6.
-        //[InlineData(new int[] { -2, 0, -1 }, 0)] // Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+        [InlineData(new int[] { -2, 0, -1 }, 0)] // Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
         public void MaximumProductSubarray(int[] nums, int expected)
         {
-            int ans = 0;
+            int ans = nums[0];
+            // Because of negative numbers, we need two arrays: 
+            // max: the index notes the Maximum Product Subarray that ends at the index
+            // min: the index notes the Minimum Product Subarray that ends at the index
+            var max = new int[nums.Length];
+            var min = new int[nums.Length];
+
+            max[0] = nums[0];
+            min[0] = nums[0];
+
+            for (int i = 1; i < nums.Length; i++)
+            {
+                // Notes for improvement: we never look further back than a finite amount (1) 
+                // so these arrays could be turned into ints
+                max[i] = Math.Max(max[i - 1] * nums[i], min[i - 1] * nums[i]);
+                min[i] = Math.Min(max[i - 1] * nums[i], min[i - 1] * nums[i]);
+                // Sometimes the max subarray is just length 1
+                max[i] = Math.Max(max[i], nums[i]);
+                min[i] = Math.Min(min[i], nums[i]);
+                ans = Math.Max(max[i], ans);
+            }
 
             Assert.Equal(expected, ans);
         }
