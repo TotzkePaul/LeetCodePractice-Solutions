@@ -550,12 +550,29 @@ namespace LeetCodePractice
         /// Each element in the array represents your maximum jump length at that position.
         /// Determine if you are able to reach the last index.
         /// </summary>
+        /// Runtime: 156 ms, faster than 96.18% of C# online submissions for Jump Game.
+        /// Memory Usage: 39.9 MB, less than 80.15% of C# online submissions for Jump Game.
         [Theory]
+        [InlineData(new int[] { 1 }, true)]
+        [InlineData(new int[] { 1, 2, 3 }, true)]
         [InlineData(new int[] { 2, 3, 1, 1, 4 }, true)] // Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
-        //[InlineData(new int[] { 3, 2, 1, 0, 4 }, false)] // Explanation: You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.
+        [InlineData(new int[] { 3, 2, 1, 0, 4 }, false)] // Explanation: You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.
         public void JumpGameI(int[] nums, bool expected)
         {
-            bool ans = false;
+            int ptr = 0;
+
+            int power = nums[ptr];
+
+            while (ptr < nums.Length -1 && power >= 0)
+            {
+                // Moving along the array, swap "battery" if it has a higher charge. 
+                power = Math.Max(power, nums[ptr]);
+                power--;
+                ptr++;                
+            }
+
+            //Strategy: check that you made it to the destination with non-negative charage.
+            bool ans = ptr == nums.Length - 1 && power >= 0;
 
             Assert.Equal(expected, ans);
         }
@@ -570,6 +587,33 @@ namespace LeetCodePractice
         public void MinimumWindowSubstring(string s, string t, string expected)
         {
             string ans = "";
+
+            int total = t.Length;
+
+            Dictionary<char, int> counts = new Dictionary<char, int>();
+            for(int i = 0; i < t.Length; i++)
+            {
+                if (!counts.ContainsKey(t[i]))
+                {
+                    counts[t[i]] = 0;
+                }
+                counts[t[i]]++;
+            }
+
+            int start = 0;
+            int end = 0;
+
+            while(end < s.Length)
+            {
+                var current = s[end];
+
+
+
+                while(total > 0)
+                {
+                    end++;
+                }
+            }
 
             Assert.Equal(expected, ans);
         }
