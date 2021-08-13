@@ -582,37 +582,71 @@ namespace LeetCodePractice
         // Note:
         // If there is no such window in S that covers all characters in T, return the empty string "".
         // If there is such window, you are guaranteed that there will always be only one unique minimum window in S.
+        // Runtime: 196 ms, faster than 16.72% of C# online submissions for Minimum Window Substring.
+        // Memory Usage: 41.7 MB, less than 6.25% of C# online submissions for Minimum Window Substring.
         [Theory]
         [InlineData("ADOBECODEBANC", "ABC", "BANC")]
+        [InlineData("A", "AA", "")]
         public void MinimumWindowSubstring(string s, string t, string expected)
         {
-            string ans = "";
+            string ans = string.Empty;
+            int maxLen = s.Length + 1;
+                      
 
-            int total = t.Length;
-
-            Dictionary<char, int> counts = new Dictionary<char, int>();
+            var counts = new Dictionary<char, int>();
             for(int i = 0; i < t.Length; i++)
             {
                 if (!counts.ContainsKey(t[i]))
                 {
-                    counts[t[i]] = 0;
+                    counts[t[i]] = 1;
                 }
-                counts[t[i]]++;
+                else
+                {
+                    counts[t[i]]++;
+                }                
             }
+            int total = counts.Count;
 
             int start = 0;
             int end = 0;
 
-            while(end < s.Length)
-            {
-                var current = s[end];
+            //expand window until window gains a substring that is a subset of t
+            while (end < s.Length)
+            {                
+                var last = s[end];
 
-
-
-                while(total > 0)
+                if (counts.ContainsKey(last))
                 {
-                    end++;
+                    counts[last]--;
+                    if (counts[last] == 0)
+                    {
+                        total--;
+                    }                    
                 }
+
+                //contract window until window losses a substring that is a subset of t
+                while (total == 0)
+                {
+                    var len = end - start+1;
+
+                    if (len < maxLen)
+                    {
+                        ans = s.Substring(start, len);
+                        maxLen = len;
+                    }
+
+                    var first = s[start];
+                    if (counts.ContainsKey(first))
+                    {
+                        counts[first]++;
+                        if (counts[first] > 0)
+                        {
+                            total++;
+                        }                            
+                    }
+                    start++;
+                }
+                end++;
             }
 
             Assert.Equal(expected, ans);
